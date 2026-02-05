@@ -124,4 +124,50 @@ class CreateTaskViewModel(
 
         onSuccess()
     }
+    fun saveDraft(onSuccess: () -> Unit) {
+        val s = _state.value
+
+        val draft = Task(
+            id = s.taskId ?: UUID.randomUUID().toString(),
+            title = s.title,
+            description = s.description,
+            projectName = s.projectName,
+            assignee = s.assignee,
+            date = s.date,
+            priority = s.priority,
+            status = TaskStatus.DRAFT,
+            comments = TaskRepository.getTaskById(s.taskId ?: "")?.comments ?: emptyList()
+        )
+
+        if (s.isEditMode) {
+            TaskRepository.updateTask(draft)
+        } else {
+            TaskRepository.addTask(draft)
+        }
+
+        onSuccess()
+    }
+    // In CreateTaskViewModel.kt add this function:
+    fun saveAsDraft(onSuccess: () -> Unit) {
+        val s = _state.value
+        // We allow saving even if fields are blank for drafts
+        val draftTask = Task(
+            id = s.taskId ?: UUID.randomUUID().toString(),
+            title = s.title.ifBlank { "Untitled Draft" },
+            description = s.description,
+            projectName = s.projectName,
+            assignee = s.assignee,
+            date = s.date,
+            priority = s.priority,
+            status = TaskStatus.DRAFT // Explicitly set to DRAFT
+        )
+
+        if (s.isEditMode || s.taskId != null) {
+            TaskRepository.updateTask(draftTask)
+        } else {
+            TaskRepository.addTask(draftTask)
+        }
+        onSuccess()
+    }
+
 }

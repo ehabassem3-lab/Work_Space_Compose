@@ -41,6 +41,7 @@ import java.util.Locale
 @Composable
 fun CreateTaskScreen(
     onDismiss: () -> Unit,
+    onNavigateToDrafts: () -> Unit, // Add this line
     viewModel: CreateTaskViewModel = viewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -69,6 +70,7 @@ fun CreateTaskScreen(
     if (showDatePicker) {
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },
+
             confirmButton = {
                 TextButton(onClick = {
                     val selectedMillis = datePickerState.selectedDateMillis
@@ -89,8 +91,17 @@ fun CreateTaskScreen(
             Row(modifier = Modifier.fillMaxWidth().padding(16.dp).statusBarsPadding(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onDismiss) { Icon(Icons.Default.Close, "Close", tint = textColor) }
                 Text(if (state.isEditMode) "Edit Task" else stringResource(R.string.create_new_task_title), style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold), color = textColor)
-                TextButton(onClick = {}) { Text(stringResource(R.string.action_drafts), color = primaryColor, fontWeight = FontWeight.Bold) }
-            }
+// Inside CreateTaskScreen.kt topBar
+                TextButton(onClick = {
+                    viewModel.saveAsDraft {
+                        onNavigateToDrafts()
+                        // Logic to navigate to Drafts screen or show message
+                        Toast.makeText(context, "Draft Saved", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                ) {
+                    Text(stringResource(R.string.action_drafts), color = primaryColor, fontWeight = FontWeight.Bold)
+                }            }
         },
         bottomBar = {
             Button(

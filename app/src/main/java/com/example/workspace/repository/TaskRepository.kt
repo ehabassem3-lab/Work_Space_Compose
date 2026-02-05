@@ -23,4 +23,8 @@ object TaskRepository {
             list.map { if (it.id == updatedTask.id) updatedTask else it }
         }
     }
+    // In TaskRepository.kt
+    fun deleteTask(taskId: String) {
+        _tasks.update { list -> list.filterNot { it.id == taskId } }
+    }
 }
